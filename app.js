@@ -1,53 +1,68 @@
 'use strict';
 
 /* ============================================================
-   CONFIGURATION — Locations & Game Data
+   DEFAULT CONFIGURATION
    ============================================================ */
-const LOCATIONS = [
-    {
-        qrValue: 'DARTAGNAN-ATHOS-2026-A',
-        name:    'Athos Eet-Maakt-Doet',
-        title:   'De Wijsheid van Athos',
-        letter:  'A',
-        points:  20,
-        task:    'Maak een foto van iets dat creativiteit uitstraalt.'
-    },
-    {
-        qrValue: 'DARTAGNAN-CAMPAGNE-2026-L',
-        name:    'Zorgcentrum Campagne',
-        title:   'Het Schild van d\'Artagnan',
-        letter:  'L',
-        points:  20,
-        task:    'Maak een foto van iets dat verbinding tussen mensen symboliseert.'
-    },
-    {
-        qrValue: 'DARTAGNAN-WOLDER-KERK-2026-L',
-        name:    'Petrus en Pauluskerk Wolder',
-        title:   'De Bescherming van Aramis',
-        letter:  'L',
-        points:  20,
-        task:    'Maak een foto waarop de kerktoren volledig zichtbaar is.'
-    },
-    {
-        qrValue: 'DARTAGNAN-APOSTELHOEVE-2026-E',
-        name:    'Apostelhoeve',
-        title:   'De Brief van de Koning',
-        letter:  'E',
-        points:  20,
-        task:    'Maak een foto van de mooiste plek bij de wijngaard.'
-    },
-    {
-        qrValue: 'DARTAGNAN-PRIXDEROME-2026-N',
-        name:    'Restaurant Prix de Rome',
-        title:   'De Gastvrijheid van Porthos',
-        letter:  'N',
-        points:  20,
-        task:    'Maak een foto waarop minimaal drie buurtbewoners plezier hebben.'
-    }
-];
+const DEFAULT_CONFIG = {
+    gameTitle:    "De Verloren Schatten van d'Artagnan",
+    introText:    "Jij bent de musketier die de vijf verloren schatten van d'Artagnan moet terugvinden.\n\nVijf locaties. Vijf opdrachten. Vijf letters.\n\nJouw missie begint hier op de D'Artagnanlaan in Maastricht.",
+    congratsText: "Je bent officieel Musketier van de D'Artagnanlaan.",
+    locations: [
+        {
+            qrValue: 'DARTAGNAN-ATHOS-2026-A',
+            name:    'Athos Eet-Maakt-Doet',
+            title:   'De Wijsheid van Athos',
+            letter:  'A',
+            points:  20,
+            task:    'Maak een foto van iets dat creativiteit uitstraalt.'
+        },
+        {
+            qrValue: 'DARTAGNAN-CAMPAGNE-2026-L',
+            name:    'Zorgcentrum Campagne',
+            title:   "Het Schild van d'Artagnan",
+            letter:  'L',
+            points:  20,
+            task:    'Maak een foto van iets dat verbinding tussen mensen symboliseert.'
+        },
+        {
+            qrValue: 'DARTAGNAN-WOLDER-KERK-2026-L',
+            name:    'Petrus en Pauluskerk Wolder',
+            title:   'De Bescherming van Aramis',
+            letter:  'L',
+            points:  20,
+            task:    'Maak een foto waarop de kerktoren volledig zichtbaar is.'
+        },
+        {
+            qrValue: 'DARTAGNAN-APOSTELHOEVE-2026-E',
+            name:    'Apostelhoeve',
+            title:   'De Brief van de Koning',
+            letter:  'E',
+            points:  20,
+            task:    'Maak een foto van de mooiste plek bij de wijngaard.'
+        },
+        {
+            qrValue: 'DARTAGNAN-PRIXDEROME-2026-N',
+            name:    'Restaurant Prix de Rome',
+            title:   'De Gastvrijheid van Porthos',
+            letter:  'N',
+            points:  20,
+            task:    'Maak een foto waarop minimaal drie buurtbewoners plezier hebben.'
+        }
+    ],
+    finalQuestion: "Wat is de beroemde spreuk van de musketiers?",
+    correctAnswer: "Eén voor allen, allen voor één",
+    answerOptions: [
+        "Eén voor allen, allen voor één",
+        "Samen sterk",
+        "Leve de koning"
+    ]
+};
 
-const CORRECT_ANSWER  = 'Eén voor allen, allen voor één';
-const STORAGE_KEY     = 'artagnan_state_v1';
+const CONFIG_KEY  = 'artagnan_config_v1';
+const STORAGE_KEY = 'artagnan_state_v1';
+
+// Active configuration — overwritten by loadConfig() if admin has saved changes
+let CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 
 /* ============================================================
    STATE
@@ -100,6 +115,62 @@ function clearState() {
 }
 
 /* ============================================================
+   CONFIG MANAGEMENT
+   ============================================================ */
+function loadConfig() {
+    try {
+        const raw = localStorage.getItem(CONFIG_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (
+            parsed &&
+            typeof parsed === 'object' &&
+            Array.isArray(parsed.locations) &&
+            parsed.locations.length === 5 &&
+            Array.isArray(parsed.answerOptions) &&
+            parsed.answerOptions.length >= 2
+        ) {
+            CONFIG = parsed;
+        }
+    } catch (_) {}
+}
+
+function applyConfigToDOM() {
+    const titleEl = document.getElementById('game-title');
+    if (titleEl) titleEl.textContent = CONFIG.gameTitle;
+
+    const introEl = document.getElementById('intro-text-container');
+    if (introEl) {
+        introEl.innerHTML = CONFIG.introText
+            .split('\n\n')
+            .filter(p => p.trim())
+            .map(p => '<p>' + escapeHTML(p.trim()) + '</p>')
+            .join('');
+    }
+
+    const subtitleEl = document.getElementById('end-subtitle');
+    if (subtitleEl) subtitleEl.textContent = CONFIG.congratsText;
+
+    const questionEl = document.getElementById('question-text');
+    if (questionEl) questionEl.textContent = CONFIG.finalQuestion;
+
+    renderAnswerOptions();
+}
+
+function renderAnswerOptions() {
+    const container = document.getElementById('answer-options');
+    if (!container) return;
+    container.innerHTML = '';
+    CONFIG.answerOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className      = 'btn btn-answer';
+        btn.dataset.answer = opt;
+        btn.textContent    = opt;
+        container.appendChild(btn);
+    });
+}
+
+/* ============================================================
    SCREEN ROUTING
    ============================================================ */
 function showScreen(id) {
@@ -147,16 +218,16 @@ function updateDashboard() {
     document.getElementById('dashboard-points').textContent = state.points;
     document.getElementById('dashboard-found').textContent  = state.foundLocations.length;
 
-    const pct = (state.foundLocations.length / LOCATIONS.length) * 100;
-    document.getElementById('progress-fill').style.width       = pct + '%';
-    document.getElementById('dashboard-progress-text').textContent = state.foundLocations.length + ' van ' + LOCATIONS.length;
+    const pct = (state.foundLocations.length / CONFIG.locations.length) * 100;
+    document.getElementById('progress-fill').style.width           = pct + '%';
+    document.getElementById('dashboard-progress-text').textContent = state.foundLocations.length + ' van ' + CONFIG.locations.length;
 
     const progressTrack = document.querySelector('.progress-track');
     if (progressTrack) progressTrack.setAttribute('aria-valuenow', state.foundLocations.length);
 
     // Letter boxes
     const letterBoxes = document.querySelectorAll('#dashboard-letters .letter-box');
-    LOCATIONS.forEach((loc, i) => {
+    CONFIG.locations.forEach((loc, i) => {
         const box = letterBoxes[i];
         if (!box) return;
         if (state.foundLocations.includes(i)) {
@@ -175,7 +246,7 @@ function updateDashboard() {
     // Location list
     const list = document.getElementById('location-list');
     list.innerHTML = '';
-    LOCATIONS.forEach((loc, i) => {
+    CONFIG.locations.forEach((loc, i) => {
         const found = state.foundLocations.includes(i);
         const item  = document.createElement('div');
         item.className = 'location-item' + (found ? ' found' : '');
@@ -240,7 +311,7 @@ function stopScanner(callback) {
 function handleScan(decodedText) {
     // Stop scanning immediately so it doesn't fire multiple times
     stopScanner(() => {
-        const locationIndex = LOCATIONS.findIndex(loc => loc.qrValue === decodedText);
+        const locationIndex = CONFIG.locations.findIndex(loc => loc.qrValue === decodedText);
 
         if (locationIndex === -1) {
             showToast('Onbekende QR-code. Dit is geen locatie van de tocht.', 'error');
@@ -264,7 +335,7 @@ function handleScan(decodedText) {
 
         // Valid scan — update state
         state.foundLocations.push(locationIndex);
-        state.points += LOCATIONS[locationIndex].points;
+        state.points += CONFIG.locations[locationIndex].points;
         currentTreasureIndex = locationIndex;
         saveState();
 
@@ -281,7 +352,7 @@ function navigateToDashboard() {
    TREASURE SCREEN
    ============================================================ */
 function showTreasureScreen(index) {
-    const loc = LOCATIONS[index];
+    const loc = CONFIG.locations[index];
     document.getElementById('treasure-title').textContent  = loc.title;
     document.getElementById('treasure-letter').textContent = loc.letter;
     document.getElementById('treasure-points').textContent = loc.points;
@@ -369,7 +440,7 @@ function stopCamera() {
 
 function proceedAfterTreasure() {
     stopCamera();
-    if (state.foundLocations.length >= LOCATIONS.length) {
+    if (state.foundLocations.length >= CONFIG.locations.length) {
         showFinale();
     } else {
         updateDashboard();
@@ -381,7 +452,7 @@ function proceedAfterTreasure() {
    FINALE — Letter reveal
    ============================================================ */
 function showFinale() {
-    const word      = LOCATIONS.map(l => l.letter).join(''); // "ALLEN"
+    const word      = CONFIG.locations.map(l => l.letter).join('');
     const container = document.getElementById('finale-letters');
     container.innerHTML = '';
 
@@ -401,7 +472,7 @@ function showFinale() {
    FINAL QUESTION
    ============================================================ */
 function submitAnswer(answer) {
-    if (answer === CORRECT_ANSWER) {
+    if (answer === CONFIG.correctAnswer) {
         showEndScreen();
     } else {
         showToast('Dat is niet het juiste antwoord. Probeer opnieuw!', 'error');
@@ -418,7 +489,7 @@ function showEndScreen() {
     // Render end-screen letters (static, no animation)
     const endLetters = document.getElementById('end-letters');
     endLetters.innerHTML = '';
-    LOCATIONS.forEach(loc => {
+    CONFIG.locations.forEach(loc => {
         const el = document.createElement('div');
         el.className   = 'letter-finale';
         el.textContent = loc.letter;
@@ -430,7 +501,7 @@ function showEndScreen() {
     grid.innerHTML = '';
     let hasPhotos  = false;
 
-    LOCATIONS.forEach((loc, i) => {
+    CONFIG.locations.forEach((loc, i) => {
         const dataURL = state.photos[i];
         if (dataURL) {
             hasPhotos = true;
@@ -506,9 +577,10 @@ function initEventListeners() {
     // Screen 6 — Finale
     document.getElementById('btn-goto-finale').addEventListener('click', () => showScreen('screen-question'));
 
-    // Screen 7 — Question
-    document.querySelectorAll('.btn-answer').forEach(btn => {
-        btn.addEventListener('click', () => submitAnswer(btn.dataset.answer));
+    // Screen 7 — Question (event delegation; buttons rendered dynamically by applyConfigToDOM)
+    document.getElementById('answer-options').addEventListener('click', e => {
+        const btn = e.target.closest('.btn-answer');
+        if (btn) submitAnswer(btn.dataset.answer);
     });
 
     // Screen 8 — End
@@ -532,12 +604,14 @@ function registerServiceWorker() {
    BOOT
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
+    loadConfig();
     loadState();
+    applyConfigToDOM();
     initEventListeners();
     registerServiceWorker();
 
     // Restore session if in-progress
-    if (state.playerName && state.foundLocations.length < LOCATIONS.length) {
+    if (state.playerName && state.foundLocations.length < CONFIG.locations.length) {
         document.getElementById('player-name').value = state.playerName;
         updateDashboard();
         showScreen('screen-dashboard');

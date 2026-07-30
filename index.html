@@ -27,11 +27,9 @@
     <div id="screen-start" class="screen active">
         <div class="screen-content">
             <div class="shield-logo" aria-hidden="true">🛡️</div>
-            <h1 class="game-title">De Verloren Schatten van d'Artagnan</h1>
-            <div class="intro-text">
-                <p>Jij bent de musketier die de vijf verloren schatten van d'Artagnan moet terugvinden.</p>
-                <p>Vijf locaties. Vijf opdrachten. Vijf letters.</p>
-                <p>Jouw missie begint hier op de D'Artagnanlaan in Maastricht.</p>
+            <h1 class="game-title" id="game-title">De Verloren Schatten van d'Artagnan</h1>
+            <div class="intro-text" id="intro-text-container">
+                <!-- Content rendered by applyConfigToDOM() in app.js -->
             </div>
             <div class="form-group">
                 <label for="player-name">Jouw naam, dapper musketier:</label>
@@ -159,12 +157,10 @@
             <div class="shield-logo" aria-hidden="true">&#128081;</div>
             <h2 class="section-title">De Ultieme Vraag</h2>
             <div class="question-scroll">
-                <p class="question-text">Wat is de beroemde spreuk van de musketiers?</p>
+                <p class="question-text" id="question-text"></p>
             </div>
-            <div class="answer-options" role="group" aria-label="Kies het juiste antwoord">
-                <button class="btn btn-answer" data-answer="Eén voor allen, allen voor één">Eén voor allen, allen voor één</button>
-                <button class="btn btn-answer" data-answer="Samen sterk">Samen sterk</button>
-                <button class="btn btn-answer" data-answer="Leve de koning">Leve de koning</button>
+            <div id="answer-options" class="answer-options" role="group" aria-label="Kies het juiste antwoord">
+                <!-- Buttons rendered by applyConfigToDOM() in app.js -->
             </div>
         </div>
     </div>
@@ -179,7 +175,7 @@
                 Gefeliciteerd,<br>
                 <span id="end-name"></span>!
             </h2>
-            <p class="end-subtitle">Je bent officieel Musketier van de D'Artagnanlaan.</p>
+            <p class="end-subtitle" id="end-subtitle"></p>
             <div class="end-stats-wrap">
                 <div class="stat-box stat-box-large">
                     <div class="stat-value" id="end-points"></div>
