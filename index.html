@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#7b1818">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="d'Artagnan">
+    <meta name="description" content="Een mobiele wandeltocht langs de verloren schatten van d'Artagnan in Maastricht.">
+    <title>De Verloren Schatten van d'Artagnan</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <!-- ================================================
+         SCREEN 1: Start
+         ================================================ -->
+    <div id="screen-start" class="screen active">
+        <div class="screen-content">
+            <div class="shield-logo" aria-hidden="true">🛡️</div>
+            <h1 class="game-title">De Verloren Schatten van d'Artagnan</h1>
+            <div class="intro-text">
+                <p>Jij bent de musketier die de vijf verloren schatten van d'Artagnan moet terugvinden.</p>
+                <p>Vijf locaties. Vijf opdrachten. Vijf letters.</p>
+                <p>Jouw missie begint hier op de D'Artagnanlaan in Maastricht.</p>
+            </div>
+            <div class="form-group">
+                <label for="player-name">Jouw naam, dapper musketier:</label>
+                <input type="text" id="player-name" placeholder="Vul hier jouw naam in" maxlength="40" autocomplete="off" autocapitalize="words">
+            </div>
+            <button id="btn-start" class="btn btn-primary btn-large">Begin de tocht</button>
+        </div>
+    </div>
+
+    <!-- ================================================
+         SCREEN 2: Dashboard
+         ================================================ -->
+    <div id="screen-dashboard" class="screen">
+        <div class="screen-content">
+            <h2 class="section-title">Missie Dashboard</h2>
+            <div class="player-info">
+                <span class="player-label">Musketier:</span>
+                <span id="dashboard-name" class="player-name-display"></span>
+            </div>
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-value" id="dashboard-points">0</div>
+                    <div class="stat-label">Punten</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value"><span id="dashboard-found">0</span>&thinsp;/&thinsp;5</div>
+                    <div class="stat-label">Schatten</div>
+                </div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-label">Voortgang: <span id="dashboard-progress-text">0 van 5</span></div>
+                <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+            <div class="letters-row" id="dashboard-letters" aria-label="Verzamelde letters">
+                <div class="letter-box empty" aria-label="Letter 1 nog niet gevonden">_</div>
+                <div class="letter-box empty" aria-label="Letter 2 nog niet gevonden">_</div>
+                <div class="letter-box empty" aria-label="Letter 3 nog niet gevonden">_</div>
+                <div class="letter-box empty" aria-label="Letter 4 nog niet gevonden">_</div>
+                <div class="letter-box empty" aria-label="Letter 5 nog niet gevonden">_</div>
+            </div>
+            <div class="location-list" id="location-list" aria-label="Locatielijst"></div>
+            <button id="btn-scan" class="btn btn-primary btn-large">&#128269; Scan QR-code</button>
+        </div>
+    </div>
+
+    <!-- ================================================
+         SCREEN 3: QR Scanner
+         ================================================ -->
+    <div id="screen-scanner" class="screen">
+        <div class="screen-content">
+            <h2 class="section-title">Scan de QR-code</h2>
+            <p class="scanner-hint">Richt de camera op de QR-code van de locatie</p>
+            <div id="qr-reader"></div>
+            <button id="btn-stop-scan" class="btn btn-secondary">&#10006; Stop scanner</button>
+        </div>
+    </div>
+
+    <!-- ================================================
+         SCREEN 4: Treasure Found
+         ================================================ -->
+    <div id="screen-treasure" class="screen">
+        <div class="screen-content">
+            <div class="found-badge">&#9876; Schat Gevonden!</div>
+            <h2 class="treasure-title" id="treasure-title"></h2>
+            <div class="letter-reveal">
+                <div class="letter-big" id="treasure-letter" aria-label="Verdiende letter"></div>
+                <div class="letter-label">Jouw letter</div>
+            </div>
+            <div class="points-earned">+<span id="treasure-points"></span> punten verdiend</div>
+            <div class="task-box">
+                <h3 class="task-title">&#9876; Opdracht</h3>
+                <p class="task-text" id="treasure-task"></p>
+            </div>
+            <div class="btn-row">
+                <button id="btn-make-photo" class="btn btn-secondary">&#128247; Maak foto</button>
+                <button id="btn-treasure-next" class="btn btn-primary">Verder &#8250;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================
+         SCREEN 5: Photo Capture
+         ================================================ -->
+    <div id="screen-photo" class="screen">
+        <div class="screen-content">
+            <h2 class="section-title">Maak je foto</h2>
+            <div class="camera-container" id="camera-container">
+                <video id="camera-preview" autoplay playsinline muted></video>
+            </div>
+            <canvas id="photo-canvas" style="display:none"></canvas>
+            <div id="photo-preview-container" class="photo-preview-wrap" style="display:none">
+                <img id="photo-preview" alt="Jouw gemaakte foto">
+            </div>
+            <div class="btn-row">
+                <button id="btn-capture" class="btn btn-primary">&#128247; Maak foto</button>
+                <button id="btn-photo-next" class="btn btn-primary" style="display:none">Opslaan &#8250;</button>
+            </div>
+            <button id="btn-photo-back" class="btn btn-text">&#8592; Terug zonder foto</button>
+        </div>
+    </div>
+
+    <!-- ================================================
+         SCREEN 6: Finale — Letters Revealed
+         ================================================ -->
+    <div id="screen-finale" class="screen">
+        <div class="screen-content">
+            <div class="shield-logo" aria-hidden="true">&#9876;</div>
+            <h2 class="section-title">Alle schatten gevonden!</h2>
+            <p class="finale-text">De vijf letters vormen samen een woord. Wat onthullen zij?</p>
+            <div class="letters-finale" id="finale-letters" aria-label="Het gevonden woord">
+                <!-- Filled dynamically -->
+            </div>
+            <p class="finale-subtext">Jij hebt de vijf verloren schatten van d'Artagnan teruggevonden.<br>Maar de missie is nog niet voorbij&hellip;</p>
+            <button id="btn-goto-finale" class="btn btn-primary btn-large">Ga naar de finale</button>
+        </div>
+    </div>
+
+    <!-- ================================================
+         SCREEN 7: Final Question
+         ================================================ -->
+    <div id="screen-question" class="screen">
+        <div class="screen-content">
+            <div class="shield-logo" aria-hidden="true">&#128081;</div>
+            <h2 class="section-title">De Ultieme Vraag</h2>
+            <div class="question-scroll">
+                <p class="question-text">Wat is de beroemde spreuk van de musketiers?</p>
+            </div>
+            <div class="answer-options" role="group" aria-label="Kies het juiste antwoord">
+                <button class="btn btn-answer" data-answer="Eén voor allen, allen voor één">Eén voor allen, allen voor één</button>
+                <button class="btn btn-answer" data-answer="Samen sterk">Samen sterk</button>
+                <button class="btn btn-answer" data-answer="Leve de koning">Leve de koning</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================
+         SCREEN 8: End / Congratulations
+         ================================================ -->
+    <div id="screen-end" class="screen">
+        <div class="screen-content">
+            <div class="end-emblem" aria-hidden="true">&#9876;&#127961;&#9876;</div>
+            <h2 class="end-title">
+                Gefeliciteerd,<br>
+                <span id="end-name"></span>!
+            </h2>
+            <p class="end-subtitle">Je bent officieel Musketier van de D'Artagnanlaan.</p>
+            <div class="end-stats-wrap">
+                <div class="stat-box stat-box-large">
+                    <div class="stat-value" id="end-points"></div>
+                    <div class="stat-label">Totaal punten</div>
+                </div>
+                <div class="end-letters" id="end-letters" aria-label="Verzameld woord"></div>
+            </div>
+            <div class="divider"></div>
+            <h3 class="photos-title">Gemaakte foto's</h3>
+            <div class="photos-grid" id="end-photos"></div>
+            <button id="btn-restart" class="btn btn-secondary">&#8635; Opnieuw spelen</button>
+        </div>
+    </div>
+
+    <!-- html5-qrcode via CDN (cached by service worker) -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

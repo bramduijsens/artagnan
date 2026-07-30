@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <!-- Background circle -->
+  <circle cx="96" cy="96" r="96" fill="#7b1818"/>
+
+  <!-- Shield body -->
+  <path d="M96 22 L158 50 L158 108 C158 148 96 174 96 174 C96 174 34 148 34 108 L34 50 Z"
+        fill="#d4af37"/>
+
+  <!-- Shield inner -->
+  <path d="M96 36 L148 60 L148 108 C148 138 96 160 96 160 C96 160 44 138 44 108 L44 60 Z"
+        fill="#7b1818"/>
+
+  <!-- Sword blade -->
+  <rect x="93" y="50" width="6" height="76" rx="2" fill="#d4af37"/>
+
+  <!-- Sword tip -->
+  <polygon points="96,42 92,56 100,56" fill="#f4e6be"/>
+
+  <!-- Crossguard -->
+  <rect x="76" y="86" width="40" height="7" rx="3" fill="#d4af37"/>
+
+  <!-- Pommel -->
+  <circle cx="96" cy="132" r="7" fill="#d4af37"/>
+  <circle cx="96" cy="132" r="3" fill="#f4e6be"/>
+
+  <!-- Decorative dots on shield -->
+  <circle cx="68" cy="72" r="4" fill="#d4af37" opacity="0.5"/>
+  <circle cx="124" cy="72" r="4" fill="#d4af37" opacity="0.5"/>
+  <circle cx="60" cy="110" r="3" fill="#d4af37" opacity="0.4"/>
+  <circle cx="132" cy="110" r="3" fill="#d4af37" opacity="0.4"/>
+</svg>

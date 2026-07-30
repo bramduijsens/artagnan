@@ -1,0 +1,27 @@
+{
+    "name": "De Verloren Schatten van d'Artagnan",
+    "short_name": "d'Artagnan",
+    "description": "Een mobiele wandeltocht langs de vijf verloren schatten van d'Artagnan in Maastricht.",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "theme_color": "#7b1818",
+    "background_color": "#f4e6be",
+    "lang": "nl",
+    "categories": ["games", "entertainment"],
+    "icons": [
+        {
+            "src": "icons/icon.svg",
+            "type": "image/svg+xml",
+            "sizes": "any",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-maskable.svg",
+            "type": "image/svg+xml",
+            "sizes": "any",
+            "purpose": "maskable"
+        }
+    ]
+}
