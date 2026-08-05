@@ -44,7 +44,7 @@ body {
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
-    padding-top: 72px;
+    padding-top: 144px;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -65,7 +65,7 @@ a {
     left: 0;
     right: 0;
     z-index: 50;
-    height: 72px;
+    height: 144px;
     background: var(--bg);
     border-bottom: 1px solid var(--border-light);
     display: flex;
@@ -75,7 +75,7 @@ a {
 }
 
 .app-logo {
-    height: 56px;
+    height: 112px;
     width: auto;
     display: block;
     filter: drop-shadow(0 2px 5px rgba(61,31,10,0.18));
@@ -86,7 +86,7 @@ a {
    ============================================================ */
 .screen {
     display: none;
-    min-height: calc(100vh - 72px);
+    min-height: calc(100vh - 144px);
     width: 100%;
     flex-direction: column;
     align-items: center;
@@ -960,7 +960,7 @@ a {
     .screen {
         max-width: 480px;
         margin: 0 auto;
-        min-height: calc(100vh - 72px);
+        min-height: calc(100vh - 144px);
         box-shadow: 0 0 40px rgba(0,0,0,0.2);
     }
     body::before {
