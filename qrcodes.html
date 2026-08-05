@@ -131,13 +131,33 @@
             border: 2px solid #d4af37;
         }
 
-        /* Print styles */
+        /* Print styles — 2 cards per page, landscape A4 */
         @media print {
-            body { background: #fff; padding: 16px; }
-            .btn-print { display: none; }
-            .subtitle { margin-bottom: 20px; }
-            .grid { gap: 16px; }
-            .card { box-shadow: none; border: 2px solid #999; }
+            @page { size: A4 landscape; margin: 12mm; }
+
+            body { background: #fff; padding: 0; margin: 0; }
+            .qr-logo, h1, .subtitle, .btn-print { display: none; }
+
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10mm;
+                max-width: 100%;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 2px solid #c8a84b;
+                padding: 14px 12px;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .card:nth-child(2n) {
+                break-after: page;
+                page-break-after: always;
+            }
+
             .card-value { color: #555; }
         }
     </style>

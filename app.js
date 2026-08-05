@@ -480,6 +480,52 @@ function submitAnswer(answer) {
 }
 
 /* ============================================================
+   PHOTO SHARING & DOWNLOAD HELPERS
+   ============================================================ */
+function dataURLToBlob(dataURL) {
+    const [header, data] = dataURL.split(',');
+    const mime  = header.match(/:(.*?);/)[1];
+    const bytes = atob(data);
+    const arr   = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+}
+
+async function sharePhoto(dataURL, locationName, number) {
+    try {
+        const blob      = dataURLToBlob(dataURL);
+        const fileName  = 'foto-' + number + '-' + locationName.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.jpg';
+        const file      = new File([blob], fileName, { type: blob.type });
+        const shareData = { files: [file], title: 'Foto bij ' + locationName };
+        if (navigator.canShare && navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.share({ title: locationName, text: "Foto van de D'Artagnanlaan wandeltocht" });
+        }
+    } catch (err) {
+        if (err.name !== 'AbortError') showToast('Delen mislukt. Probeer de downloadknop.', 'error');
+    }
+}
+
+async function shareAllPhotos(photoData) {
+    try {
+        const files = photoData.map(p => {
+            const blob = dataURLToBlob(p.dataURL);
+            const name = 'foto-' + (p.index + 1) + '-' + p.name.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.jpg';
+            return new File([blob], name, { type: blob.type });
+        });
+        const shareData = { files, title: "De Verloren Schatten van d'Artagnan", text: "Mijn foto's van de wandeltocht" };
+        if (navigator.canShare && navigator.canShare(shareData)) {
+            await navigator.share(shareData);
+        } else {
+            showToast("Meerdere foto's delen wordt niet ondersteund door deze browser.", 'error');
+        }
+    } catch (err) {
+        if (err.name !== 'AbortError') showToast("Delen mislukt. Probeer de foto's individueel te delen.", 'error');
+    }
+}
+
+/* ============================================================
    END SCREEN
    ============================================================ */
 function showEndScreen() {
@@ -497,37 +543,74 @@ function showEndScreen() {
     });
 
     // Photos grid
-    const grid = document.getElementById('end-photos');
-    grid.innerHTML = '';
-    let hasPhotos  = false;
+    const grid         = document.getElementById('end-photos');
+    const photoActions = document.getElementById('end-photo-actions');
+    grid.innerHTML         = '';
+    photoActions.innerHTML = '';
+    let hasPhotos = false;
 
     CONFIG.locations.forEach((loc, i) => {
         const dataURL = state.photos[i];
-        if (dataURL) {
-            hasPhotos = true;
-            const card  = document.createElement('div');
-            card.className = 'photo-card';
+        if (!dataURL) return;
+        hasPhotos = true;
 
-            const img   = document.createElement('img');
-            img.src     = dataURL;
-            img.alt     = 'Foto bij ' + loc.name;
-            img.loading = 'lazy';
+        const card = document.createElement('div');
+        card.className = 'photo-card';
 
-            const label     = document.createElement('div');
-            label.className = 'photo-label';
-            label.textContent = loc.name;
+        const img = document.createElement('img');
+        img.src     = dataURL;
+        img.alt     = 'Foto bij ' + loc.name;
+        img.loading = 'lazy';
 
-            card.appendChild(img);
-            card.appendChild(label);
-            grid.appendChild(card);
+        const label = document.createElement('div');
+        label.className   = 'photo-label';
+        label.textContent = loc.name;
+
+        const actions = document.createElement('div');
+        actions.className = 'photo-actions';
+
+        // Download as local file
+        const fileName = 'foto-' + (i + 1) + '-' + loc.name.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.jpg';
+        const btnDl = document.createElement('a');
+        btnDl.className  = 'btn-photo-action';
+        btnDl.href       = dataURL;
+        btnDl.download   = fileName;
+        btnDl.textContent = '\u2B07 Download';
+        actions.appendChild(btnDl);
+
+        if (navigator.share) {
+            const btnShare = document.createElement('button');
+            btnShare.className   = 'btn-photo-action';
+            btnShare.textContent = '\u2B06 Delen';
+            btnShare.addEventListener('click', () => sharePhoto(dataURL, loc.name, i + 1));
+            actions.appendChild(btnShare);
         }
+
+        card.appendChild(img);
+        card.appendChild(label);
+        card.appendChild(actions);
+        grid.appendChild(card);
     });
 
     if (!hasPhotos) {
         const p = document.createElement('p');
         p.className   = 'no-photos-text';
-        p.textContent = 'Geen foto\'s gemaakt tijdens de tocht.';
+        p.textContent = "Geen foto's gemaakt tijdens de tocht.";
         grid.appendChild(p);
+    }
+
+    // "Share all" when multiple photos are available
+    if (hasPhotos && navigator.share) {
+        const allPhotos = CONFIG.locations
+            .map((loc, i) => state.photos[i] ? { dataURL: state.photos[i], name: loc.name, index: i } : null)
+            .filter(Boolean);
+        if (allPhotos.length > 1) {
+            const btnShareAll = document.createElement('button');
+            btnShareAll.className   = 'btn btn-secondary';
+            btnShareAll.textContent = '\u2B06 Deel alle foto\u2019s (' + allPhotos.length + ')';
+            btnShareAll.addEventListener('click', () => shareAllPhotos(allPhotos));
+            photoActions.appendChild(btnShareAll);
+        }
     }
 
     showScreen('screen-end');
