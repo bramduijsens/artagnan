@@ -9,6 +9,7 @@ const LOCAL_ASSETS = [
     './style.css',
     './app.js',
     './manifest.json',
+    './logo.png',
     './icons/icon.svg',
     './icons/icon-maskable.svg'
 ];
