@@ -53,12 +53,12 @@
 
         .btn-print:hover { background: #9e2020; }
 
-        .grid {
+        .print-page {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 24px;
             max-width: 900px;
-            margin: 0 auto;
+            margin: 0 auto 48px;
         }
 
         .card {
@@ -131,31 +131,50 @@
             border: 2px solid #d4af37;
         }
 
-        /* Print styles — 2 cards per page, landscape A4 */
-        @media print {
-            @page { size: A4 landscape; margin: 12mm; }
+        .card-logo {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 14px;
+            border-radius: 8px;
+        }
 
+        /* Always print landscape A4 */
+        @page { size: A4 landscape; margin: 12mm; }
+
+        /* Print styles — 2 cards per page */
+        @media print {
             body { background: #fff; padding: 0; margin: 0; }
             .qr-logo, h1, .subtitle, .btn-print { display: none; }
 
-            .grid {
+            .print-page {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10mm;
                 max-width: 100%;
+                margin: 0;
+                height: 186mm;
+                break-after: page;
+                page-break-after: always;
+            }
+
+            .print-page:last-child {
+                break-after: auto;
+                page-break-after: auto;
             }
 
             .card {
                 box-shadow: none;
                 border: 2px solid #c8a84b;
                 padding: 14px 12px;
-                break-inside: avoid;
-                page-break-inside: avoid;
             }
 
-            .card:nth-child(2n) {
-                break-after: page;
-                page-break-after: always;
+            .card-logo {
+                max-height: 60mm;
+                width: auto;
+                max-width: 100%;
+                display: block;
+                margin: 0 auto 10px;
             }
 
             .card-value { color: #555; }
@@ -170,7 +189,7 @@
 
     <button class="btn-print" onclick="window.print()">🖨️ Afdrukken</button>
 
-    <div class="grid" id="grid"></div>
+    <div id="grid"></div>
 
     <!-- QR code library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -207,13 +226,21 @@
         const locations = getLocations();
 
         const grid = document.getElementById('grid');
+        let currentPage = null;
 
-        locations.forEach(loc => {
+        locations.forEach((loc, idx) => {
+            if (idx % 2 === 0) {
+                currentPage = document.createElement('div');
+                currentPage.className = 'print-page';
+                grid.appendChild(currentPage);
+            }
+
             // Card
             const card = document.createElement('div');
             card.className = 'card';
 
             card.innerHTML =
+                '<img src="logo.png" class="card-logo" alt="De Verloren Schatten van d\'Artagnan">' +
                 '<div class="card-number">Locatie ' + loc.number + ' van 5</div>' +
                 '<div class="card-title">' + loc.title + '</div>' +
                 '<div class="card-location">' + loc.location + '</div>' +
@@ -221,7 +248,7 @@
                 '<div class="card-value">' + loc.value + '</div>' +
                 '<div class="card-letter">' + loc.letter + '</div>';
 
-            grid.appendChild(card);
+            currentPage.appendChild(card);
 
             // Generate QR code into the placeholder div
             new QRCode(document.getElementById('qr-' + loc.number), {
