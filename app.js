@@ -180,8 +180,10 @@ function showScreen(id) {
         el.classList.add('active');
         window.scrollTo(0, 0);
     }
-    // Hide header on photo screen to maximise camera space
-    document.getElementById('app-header').style.display = id === 'screen-photo' ? 'none' : '';
+    // Hide header and reclaim its space on the photo screen
+    const isPhoto = id === 'screen-photo';
+    document.getElementById('app-header').style.display = isPhoto ? 'none' : '';
+    document.body.style.paddingTop = isPhoto ? '0' : '';
 }
 
 /* ============================================================
