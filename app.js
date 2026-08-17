@@ -354,16 +354,13 @@ function navigateToDashboard() {
 function showTreasureScreen(index) {
     const loc = CONFIG.locations[index];
     document.getElementById('treasure-title').textContent  = loc.title;
-    document.getElementById('treasure-letter').textContent = loc.letter;
+    document.getElementById('treasure-letter').textContent = '?'; // revealed after photo
     document.getElementById('treasure-points').textContent = loc.points;
     document.getElementById('treasure-task').textContent   = loc.task;
 
-    // Re-trigger the letter drop animation
+    // Suppress animation for the mystery '?'
     const letterEl = document.getElementById('treasure-letter');
     letterEl.style.animation = 'none';
-    // Force reflow
-    void letterEl.offsetWidth;
-    letterEl.style.animation = '';
 
     showScreen('screen-treasure');
 }
@@ -399,6 +396,7 @@ function resetPhotoScreen() {
     document.getElementById('photo-preview-container').style.display = 'none';
     document.getElementById('btn-capture').style.display            = '';
     document.getElementById('btn-photo-next').style.display         = 'none';
+    document.getElementById('photo-letter-reveal').style.display    = 'none';
 }
 
 function capturePhoto() {
@@ -427,6 +425,16 @@ function capturePhoto() {
     // Persist
     state.photos[currentTreasureIndex] = dataURL;
     saveState();
+
+    // Reveal the earned letter now that the photo task is complete
+    const loc       = CONFIG.locations[currentTreasureIndex];
+    const revealEl  = document.getElementById('photo-letter-reveal');
+    const letterEl  = document.getElementById('photo-letter-display');
+    letterEl.textContent   = loc.letter;
+    letterEl.style.animation = 'none';
+    void letterEl.offsetWidth; // force reflow to restart animation
+    letterEl.style.animation = '';
+    revealEl.style.display  = '';
 }
 
 function stopCamera() {

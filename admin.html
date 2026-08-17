@@ -602,7 +602,7 @@ function buildLocationCards() {
                     '</div>' +
                 '</div>' +
                 '<div class="field">' +
-                    '<label>Opdracht</label>' +
+                    '<label>Foto opdracht</label>' +
                     '<textarea id="loc-' + i + '-task" rows="3">' + taskVal + '</textarea>' +
                 '</div>' +
             '</div>';
@@ -692,16 +692,24 @@ function saveConfig() {
     const qrChanged = cfg.locations.some((loc, i) => loc.qrValue !== savedQrValues[i]);
 
     try {
-        localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+        const json = JSON.stringify(cfg);
+        localStorage.setItem(CONFIG_KEY, json);
+
+        // Verify the write actually succeeded
+        if (localStorage.getItem(CONFIG_KEY) !== json) {
+            showStatus('Opslaan mislukt \u2014 kon niet verifi\u00ebren. Gebruik geen priv\u00e9venster.', 'error');
+            return;
+        }
+
         config        = cfg;
         savedQrValues = cfg.locations.map(l => l.qrValue);
         if (qrChanged) {
-            showStatus('Opgeslagen \u2014 QR-waarden gewijzigd: herprint de QR-codes!', 'warn');
+            showStatus('\u2713 Opgeslagen \u2014 QR-waarden gewijzigd: herprint de QR-codes!', 'warn');
         } else {
-            showStatus('\u2713 Opgeslagen! Herlaad de app om de wijzigingen te zien.', '');
+            showStatus('\u2713 Opgeslagen! Open de app opnieuw om de wijzigingen te zien.', '');
         }
     } catch (_) {
-        showStatus('Opslaan mislukt \u2014 localStorage vol?', 'error');
+        showStatus('Opslaan mislukt \u2014 localStorage niet beschikbaar. Gebruik geen priv\u00e9venster.', 'error');
     }
 }
 

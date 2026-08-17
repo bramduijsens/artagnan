@@ -36,7 +36,7 @@
                 <!-- Content rendered by applyConfigToDOM() in app.js -->
             </div>
             <div class="form-group">
-                <label for="player-name">Jouw naam, dapper musketier:</label>
+                <label for="player-name">Jouw naam, dappere musketier:</label>
                 <input type="text" id="player-name" placeholder="Vul hier jouw naam in" maxlength="40" autocomplete="off" autocapitalize="words">
             </div>
             <button id="btn-start" class="btn btn-primary btn-large">Begin de tocht</button>
@@ -101,12 +101,12 @@
             <div class="found-badge">&#9876; Schat Gevonden!</div>
             <h2 class="treasure-title" id="treasure-title"></h2>
             <div class="letter-reveal">
-                <div class="letter-big" id="treasure-letter" aria-label="Verdiende letter"></div>
-                <div class="letter-label">Jouw letter</div>
+                <div class="letter-big" id="treasure-letter" aria-label="Letter nog niet onthuld">?</div>
+                <div class="letter-label">Maak de foto om je letter te onthullen</div>
             </div>
             <div class="points-earned">+<span id="treasure-points"></span> punten verdiend</div>
             <div class="task-box">
-                <h3 class="task-title">&#9876; Opdracht</h3>
+                <h3 class="task-title">&#128247; Foto opdracht</h3>
                 <p class="task-text" id="treasure-task"></p>
             </div>
             <div class="btn-row">
@@ -128,6 +128,10 @@
             <canvas id="photo-canvas" style="display:none"></canvas>
             <div id="photo-preview-container" class="photo-preview-wrap" style="display:none">
                 <img id="photo-preview" alt="Jouw gemaakte foto">
+                <div id="photo-letter-reveal" class="letter-reveal" style="display:none">
+                    <div class="letter-big" id="photo-letter-display" aria-label="Verdiende letter"></div>
+                    <div class="letter-label">Jouw letter</div>
+                </div>
             </div>
             <div class="btn-row">
                 <button id="btn-capture" class="btn btn-primary">&#128247; Maak foto</button>
