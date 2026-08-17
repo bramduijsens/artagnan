@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
             qrValue: 'DARTAGNAN-PRIXDEROME-2026-N',
             name:    'Restaurant Prix de Rome',
             title:   'De Gastvrijheid van Porthos',
-            letter:  'N',
+            letter:  'A',
             points:  20,
             task:    'Maak een foto van zoveel mogelijk buurtbewoners op een bankje.'
         },
@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
             qrValue: 'DARTAGNAN-APOSTELHOEVE-2026-E',
             name:    'Apostelhoeve',
             title:   'De Brief van de Koning',
-            letter:  'E',
+            letter:  'L',
             points:  20,
             task:    'Maak een foto van een buurtbewoner boven de 60 en een buurtbewoner onder de 10 die samen bij een wijnrank staan.'
         },
@@ -36,7 +36,7 @@ const DEFAULT_CONFIG = {
             qrValue: 'DARTAGNAN-CAMPAGNE-2026-L',
             name:    'Zorgcentrum Campagne',
             title:   "Het Schild van d'Artagnan",
-            letter:  'L',
+            letter:  'E',
             points:  20,
             task:    'Maak een foto waarop minimaal 3 (meer mag altijd) buurtbewoners samen muziek maken, ga op zoek naar instrumenten!'
         },
@@ -44,7 +44,7 @@ const DEFAULT_CONFIG = {
             qrValue: 'DARTAGNAN-ATHOS-2026-A',
             name:    'Athos Eet-Maakt-Doet',
             title:   'De Wijsheid van Athos',
-            letter:  'A',
+            letter:  'N',
             points:  20,
             task:    'Maak een foto met minimaal 2 buurtbewoners die je voor vandaag nog niet kende.'
         }

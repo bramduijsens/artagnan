@@ -822,6 +822,22 @@ a {
     opacity: 1;
 }
 
+.share-banner {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--secondary);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-align: center;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    border: 2px solid var(--secondary);
+    box-shadow: 0 4px 14px var(--shadow);
+    line-height: 1.4;
+}
+
 .photos-title {
     font-family: var(--font-display);
     color: var(--primary);
