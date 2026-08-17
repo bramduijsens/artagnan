@@ -486,6 +486,17 @@
         </div>
     </div>
 
+    <!-- ===== TEST MODUS ===== -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h2>&#9881; Test modus</h2>
+        </div>
+        <div class="section-body">
+            <p style="font-family:var(--font-b);font-size:0.95rem;line-height:1.5;color:var(--dark);">Open de app met een testbalk om zonder QR-codes of camera door alle stappen heen en weer te navigeren.</p>
+            <button class="btn-save" id="btn-test-mode" style="margin-top:4px;">&#9881; Open app in test modus</button>
+        </div>
+    </div>
+
 </main>
 
 <!-- Sticky action bar -->
@@ -743,6 +754,11 @@ function escHTML(str) {
         .replace(/"/g, '&quot;');
 }
 
+function startTestMode() {
+    try { localStorage.setItem('artagnan_testmode', '1'); } catch (_) {}
+    window.open('index.html', '_blank');
+}
+
 /* ---- Init ---- */
 loadConfig();
 populateForm();
@@ -751,6 +767,7 @@ updateWordPreview();
 
 document.getElementById('btn-save').addEventListener('click',  saveConfig);
 document.getElementById('btn-reset').addEventListener('click', resetConfig);
+document.getElementById('btn-test-mode').addEventListener('click', startTestMode);
 </script>
 
 </body>

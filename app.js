@@ -376,6 +376,12 @@ function startCamera() {
     showScreen('screen-photo');
     resetPhotoScreen();
 
+    if (isTestMode()) {
+        const cont = document.getElementById('camera-container');
+        cont.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:#d4af37;font-family:Georgia,serif;font-size:0.9rem;text-align:center;">&#128247;<br>Camera<br><small style="opacity:.7">(test modus)</small></div>';
+        return;
+    }
+
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         showToast('Camera wordt niet ondersteund door deze browser.', 'error');
         showTreasureScreen(currentTreasureIndex);
@@ -404,17 +410,32 @@ function resetPhotoScreen() {
 }
 
 function capturePhoto() {
-    const video  = document.getElementById('camera-preview');
-    const canvas = document.getElementById('photo-canvas');
-    const ctx    = canvas.getContext('2d');
+    let dataURL;
 
-    const w = video.videoWidth  || 640;
-    const h = video.videoHeight || 480;
-    canvas.width  = w;
-    canvas.height = h;
-    ctx.drawImage(video, 0, 0, w, h);
-
-    const dataURL = canvas.toDataURL('image/jpeg', 0.72);
+    if (isTestMode()) {
+        const c   = document.createElement('canvas');
+        c.width   = 320;
+        c.height  = 240;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle    = '#3d1f0a';
+        ctx.fillRect(0, 0, 320, 240);
+        ctx.fillStyle    = '#d4af37';
+        ctx.font         = 'bold 16px Georgia, serif';
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Test foto \u2014 ' + CONFIG.locations[currentTreasureIndex].name, 160, 120);
+        dataURL = c.toDataURL('image/jpeg', 0.7);
+    } else {
+        const video  = document.getElementById('camera-preview');
+        const canvas = document.getElementById('photo-canvas');
+        const ctx    = canvas.getContext('2d');
+        const w = video.videoWidth  || 640;
+        const h = video.videoHeight || 480;
+        canvas.width  = w;
+        canvas.height = h;
+        ctx.drawImage(video, 0, 0, w, h);
+        dataURL = canvas.toDataURL('image/jpeg', 0.72);
+    }
 
     stopCamera();
 
@@ -640,6 +661,96 @@ function escapeHTML(str) {
 }
 
 /* ============================================================
+   TEST MODE
+   ============================================================ */
+const TEST_MODE_KEY = 'artagnan_testmode';
+
+function isTestMode() {
+    try { return localStorage.getItem(TEST_MODE_KEY) === '1'; } catch (_) { return false; }
+}
+
+function initTestToolbar() {
+    let step = 0;
+    const steps = [];
+
+    steps.push({ label: 'Start',     go: () => showScreen('screen-start') });
+    steps.push({ label: 'Dashboard', go: () => { _tPlayer(); updateDashboard(); showScreen('screen-dashboard'); } });
+    steps.push({ label: 'Scanner',   go: () => { _tPlayer(); showScreen('screen-scanner'); } });
+
+    CONFIG.locations.forEach((loc, i) => {
+        steps.push({
+            label: 'Schat ' + (i + 1) + ' \u2014 ' + loc.name,
+            go:    () => { _tPlayer(); _tFound(i); currentTreasureIndex = i; showTreasureScreen(i); }
+        });
+        steps.push({
+            label: 'Foto ' + (i + 1) + ' \u2014 ' + loc.name,
+            go:    () => { _tPlayer(); currentTreasureIndex = i; startCamera(); }
+        });
+    });
+
+    steps.push({ label: 'Finale',     go: () => { _tAll(); showFinale(); } });
+    steps.push({ label: 'Eindvraag',  go: () => { _tAll(); showScreen('screen-question'); } });
+    steps.push({ label: 'Eindscherm', go: () => { _tAll(); showEndScreen(); } });
+
+    function _tPlayer() {
+        if (!state.playerName) {
+            state.playerName = 'Tester';
+            document.getElementById('player-name').value = 'Tester';
+        }
+    }
+    function _tFound(i) {
+        if (!state.foundLocations.includes(i)) {
+            state.foundLocations.push(i);
+            state.points += CONFIG.locations[i].points;
+        }
+    }
+    function _tAll() {
+        _tPlayer();
+        CONFIG.locations.forEach((_, i) => _tFound(i));
+    }
+
+    const btnCss = 'padding:5px 12px;background:#2a2a4e;color:#d4af37;border:1px solid #554400;border-radius:4px;cursor:pointer;font-family:\'Cinzel\',Georgia,serif;font-size:0.7rem;flex-shrink:0;-webkit-tap-highlight-color:transparent;';
+
+    const bar  = document.createElement('div');
+    const lbl  = document.createElement('span');
+    const prev = document.createElement('button');
+    const next = document.createElement('button');
+    const stop = document.createElement('button');
+
+    bar.id             = 'test-bar';
+    bar.style.cssText  = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;display:flex;align-items:center;gap:6px;padding:8px 10px;background:#1a1a2e;border-top:2px solid #d4af37;box-shadow:0 -3px 12px rgba(0,0,0,0.5);';
+    lbl.style.cssText  = 'flex:1;min-width:0;color:#d4af37;font-family:\'Cinzel\',Georgia,serif;font-size:0.68rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    prev.textContent   = '\u25c4 Vorige';
+    next.textContent   = 'Volgende \u25ba';
+    stop.textContent   = '\u2715 Stop';
+    prev.style.cssText = btnCss;
+    next.style.cssText = btnCss;
+    stop.style.cssText = btnCss + 'background:#5a0f0f;border-color:#c00;color:#fdd;';
+
+    function goTo(i) {
+        step               = Math.max(0, Math.min(steps.length - 1, i));
+        lbl.textContent    = '\u2699 ' + (step + 1) + '/' + steps.length + ' \u2014 ' + steps[step].label;
+        prev.style.opacity = step === 0                ? '0.35' : '1';
+        next.style.opacity = step === steps.length - 1 ? '0.35' : '1';
+        steps[step].go();
+    }
+
+    prev.addEventListener('click', () => goTo(step - 1));
+    next.addEventListener('click', () => goTo(step + 1));
+    stop.addEventListener('click', () => {
+        try { localStorage.removeItem(TEST_MODE_KEY); } catch (_) {}
+        document.body.style.paddingBottom = '';
+        bar.remove();
+    });
+
+    bar.append(lbl, prev, next, stop);
+    document.body.appendChild(bar);
+    document.body.style.paddingBottom = '48px';
+
+    goTo(0);
+}
+
+/* ============================================================
    EVENT LISTENERS
    ============================================================ */
 function initEventListeners() {
@@ -704,6 +815,11 @@ document.addEventListener('DOMContentLoaded', () => {
     applyConfigToDOM();
     initEventListeners();
     registerServiceWorker();
+
+    if (isTestMode()) {
+        initTestToolbar();
+        return;
+    }
 
     // Restore session if in-progress
     if (state.playerName && state.foundLocations.length < CONFIG.locations.length) {
